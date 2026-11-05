@@ -68,9 +68,9 @@ function chartMarkup(kind, width = 500) {
 }
 if (typeof module !== "undefined") module.exports = { chartMarkup, SERIES };
 
-/* Configura aquí el endpoint de tu CRM o servidor cuando esté disponible. */
+/* El servidor recibe el formulario y confirma su guardado en Google Sheets. */
 const LANDING_CONFIG = Object.freeze({
-  formEndpoint: "",
+  formEndpoint: "/api/leads",
   countdownSeconds: 480,
   modalDelayMs: 120000,
 });
@@ -156,11 +156,7 @@ const LANDING_CONFIG = Object.freeze({
     button.disabled = true;
     status.textContent = "Enviando tus datos…";
     try {
-      const response = await fetch(LANDING_CONFIG.formEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(new FormData(form))),
-      });
+      const response = await window.LandingLeads.submit(form, LANDING_CONFIG.formEndpoint);
       if (!response.ok) throw new Error("No se pudo enviar");
       status.textContent =
         "Recibimos tus datos. Un asesor se pondrá en contacto contigo.";

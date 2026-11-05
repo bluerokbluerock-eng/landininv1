@@ -1,45 +1,42 @@
 LANDININV1 — HTML, CSS Y JAVASCRIPT PUROS
 
 Uso
-Abre index.html directamente en un navegador. También puedes subir toda esta
-carpeta a cualquier hosting estático, manteniendo su estructura de archivos.
-No hace falta instalar Node, React, Astro ni ejecutar un proceso de compilación.
+La página conserva su diseño original y sus recursos locales. Para que el
+formulario funcione, usa el servidor Node incluido: node --env-file=.env server.mjs
+Requiere Node 24. No necesita dependencias ni compilación del frontend.
+Abrir index.html directamente sirve para revisar el diseño, sin envío de datos.
 
 Subir a Railway
-1. Sube el contenido de esta carpeta a un repositorio de GitHub y conecta ese
-   repositorio a un servicio de Railway.
-2. Si subes todo el repositorio landings, configura Root Directory como
-   /landininv1 y la ruta del archivo de configuración como
-   /landininv1/railway.json en el servicio. Si esta carpeta es la raíz de su
-   propio repositorio, no hace falta configurar un subdirectorio.
-3. Railway construye el Dockerfile incluido. No necesitas definir un comando
-   de build ni un comando de inicio adicional.
-4. En Networking, genera el dominio del servicio. El servidor utiliza el puerto
-   PORT asignado por Railway (8080 si no hay uno definido).
-
-La página continúa siendo HTML, CSS y JavaScript puros. Nginx solo sirve los
-archivos dentro del contenedor. railway.json comprueba la ruta / al arrancar.
-Esta carpeta está preparada para el despliegue; no se ha publicado en una cuenta
-de Railway ni se ha ejecutado Docker en este equipo, donde no está instalado.
-Referencia: https://docs.railway.com/services
+1. Conecta el repositorio que contiene esta carpeta a un servicio de Railway.
+2. Si el repositorio es landings, configura Root Directory como /landininv1
+   y el archivo de configuración como /landininv1/railway.json.
+3. Railway construye el Dockerfile; no agregues comandos de build o inicio.
+4. En Variables configura GOOGLE_SHEETS_WEBAPP_URL y GOOGLE_SHEETS_TOKEN.
+   Son los mismos valores privados para las seis landings.
+5. Genera el dominio en Networking. El servidor escucha en PORT (8080 por defecto).
+La integración necesita que el receptor Apps Script esté desplegado y autorizado
+en la cuenta de Zaira. Preparar archivos no publica automáticamente en Railway.
 
 Archivos
-index.html       Contenido y estructura de la landing.
-styles.css       Estilos compilados y adaptación a móvil, tablet y escritorio.
-script.js        Contador, formulario, gráficos, avisos y modal.
-assets/          Imagen y fuentes locales; licencias de los recursos.
-Dockerfile       Contenedor de Nginx para Railway.
-nginx.conf       Servidor estático que escucha en el puerto PORT.
-railway.json     Configuración de build y comprobación de disponibilidad.
+index.html / styles.css / script.js  Página original y sus interacciones.
+leads-client.js                     Envío y reintentos sin duplicados.
+server.mjs                         Archivos públicos y endpoint /api/leads.
+landing.config.json                Identidad de esta landing en el servidor.
+assets/                            Imágenes, fuentes y licencias.
+Dockerfile / railway.json          Despliegue sin dependencias adicionales.
+.env.example                       Variables de ejemplo, sin claves reales.
+nginx.conf                         Configuración anterior; ya no se utiliza.
 
 Formulario
-El ZIP original no incluye un servidor, CRM, correo ni número de WhatsApp receptor.
-El formulario valida los cinco campos. Mientras no tenga un destino configurado,
-muestra que los datos no se han enviado. No guarda los datos personales.
-Para conectarlo, configura formEndpoint al inicio de LANDING_CONFIG en script.js.
-El endpoint debe aceptar POST con JSON: name, email, phone, country y dob,
-y responder con un estado HTTP satisfactorio cuando reciba el registro.
-Usa un servidor para credenciales o claves privadas, nunca este archivo público.
+Valida nombre, correo, WhatsApp, país y fecha de nacimiento. El servidor añade
+landininv1 — Data Strategic como origen; no acepta una identidad elegida por el cliente.
+La hoja recibe fecha y hora, landing, los cinco campos, página e ID de registro.
+No se guardan datos personales en localStorage ni se publican claves privadas.
+El ID se conserva en memoria si falla un envío y permite reintentar sin duplicar.
+Solo muestra confirmación cuando Google Sheets devuelve el ID guardado. Si falta
+configuración o falla Google, conserva el formulario y permite volver a intentarlo.
+Nunca pongas el token en script.js, index.html o un repositorio. Para uso local,
+copia .env.example a .env y completa las variables; .env está excluido de Git.
 
 Comportamientos conservados
 - Contador de ocho minutos sincronizado entre ambas secciones. Mantiene su fecha
